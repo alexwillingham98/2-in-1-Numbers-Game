@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roll The Dice</title>
+    <!--Google Font-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <!--Stylesheet-->
+    <link rel="stylesheet" href="highRoll.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to High Roll!</h2>
+        <br><br>
+        <div class="dice-wrapper">
+            <img  id="die-1">
+            <img  id="die-2">
+        </div>
+        <p id="total"></p>
+        <p id="user"></p>
+        <button type = "button" class = "button button2" onclick="roll()">ROLL THE DICE</button> <br>
+        <button type = "button" class = "button button2" onclick="window.location.href='index.html'">Return </button>
+        <p id="userWon"></p>
+        <p id="userLost"></p>
+        
+    </div>
+    <!--Script-->
+    <script src="highRoll.js"></script>
+</body>
+</html>

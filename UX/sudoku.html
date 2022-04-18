@@ -1,0 +1,210 @@
+<html>
+<head>
+	<title>Sudoku</title>
+	<link rel = "stylesheet" type = "text/css" href = "sudoku.css">
+	<script type="text/javascript" src="sudoku.js"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+<script type="text/javascript">
+// this function will initialize a new game of sudoku
+function initialize() {
+	moves = 0;
+	states = new Array();
+	curBoard = new Array(new Array(),
+							  new Array(),
+							  new Array(),
+							  new Array());
+	for(var i = 0; i < 4; i++) {
+		for(var j = 0; j < 4; j++) {
+			curBoard[i][j] = initBoard[i][j];
+		}
+	}
+	update();
+}
+
+// handles when a user selects a number
+function select(num, id) {
+	id = id.toString();
+	var x = id.substring(0,1);
+	var y = id.substring(1,2);
+	curBoard[x][y] = num;
+	moves++;
+	update();
+}
+
+// makes sure selected number is valid for the row
+function checkRow(x, y, num) {
+	for(var i = 0; i < y; i++) { if(curBoard[x][i] == num) return false; }
+	for(var i = y + 1; i < 4; i++) { if(curBoard[x][i] == num) return false; }
+	return true;
+}
+
+// makes sure selected number is valid for the column
+function checkCol(x, y, num) {
+	for(var i = 0; i < x; i++) { if(curBoard[i][y] == num) return false; }
+	for(var i = x + 1; i < 4; i++) { if(curBoard[i][y] == num) return false; }
+	return true;
+}
+
+// makes sure selected number is valid for the 2x2 region
+function checkReg(x, y, num) {
+	var region;
+	if(x < 2 && y < 2) { region = 1; }
+	else if(x < 2 && y > 1) { region = 2; }
+	else if(x > 1 && y < 2) { region = 3; }
+	else if(x > 1 && y > 1) { region = 4; }
+
+	if(region == 1) {
+		for(var i = 0; i <= 1; i++) {
+			for(var j = 0; j <= 1; j++) {
+				if(i == x && j == y) { continue; }
+				if(curBoard[i][j] == num) { return false; }
+			}
+		}
+		return true;
+	} else if(region == 2) {
+		for(var i = 0; i <= 1; i++) {
+			for(var j = 2; j <= 3; j++) {
+				if(i == x && j == y) { continue; }
+				if(curBoard[i][j] == num) { return false; }
+			}
+		}
+		return true;
+	} else if (region == 3) {
+		for(var i = 2; i <= 3; i++) {
+			for(var j = 0; j <= 1; j++) {
+				if(i == x && j == y) { continue; }
+				if(curBoard[i][j] == num) { return false; }
+			}
+		}
+		return true;
+	} else if (region == 4) {
+		for(var i = 2; i <= 3; i++) {
+			for(var j = 2; j <= 3; j++) {
+				if(i == x && j == y) { continue; }
+				if(curBoard[i][j] == num) { return false; }
+			}
+		}
+		return true;
+	}
+}
+
+// undo a move
+function undo() {
+	if(moves == 0) { alert("You haven't made any moves yet!"); }
+	else {
+		moves--;
+		states.pop();
+		curBoard = states.pop();
+		update();
+	}
+}
+
+// alert for a win
+function win() {
+	alert("YOU WON!!!");
+
+	initialize();
+}
+
+// restart the game
+function restart() {
+	initialize();
+}
+
+
+// update the status of the board
+function update() {
+	document.getElementById("moveCount").innerHTML = "Number of moves: " + moves;
+	// create a new array object to save the state of the board for undos
+	var pushBoard = new Array(new Array(),
+							  new Array(),
+							  new Array(),
+							  new Array());
+	for(var i = 0; i < 4; i++) {
+		for(var j = 0; j < 4; j++) {
+			pushBoard[i][j] = curBoard[i][j];
+		}
+	}
+	states.push(pushBoard);
+
+	var won = true;
+
+	// fill the board
+	for(var x = 0; x < 4; x++) {
+		for(var y = 0; y < 4; y++) {
+			var div = document.getElementById(x.toString() + y.toString());
+			if(curBoard[x][y] != 0) {
+				div.innerHTML = "<h2>" + curBoard[x][y] + "</h2>";
+			} else {
+				won = false;
+				var tableText = '<table class="inner"><tr>';
+	
+				// top half of 2x2 table
+				for(var i = 1; i <= 2; i++) {
+					if(!checkRow(x, y, i) || !checkCol(x, y, i) || !checkReg(x, y, i)) continue;
+					tableText += "<td><a onclick='select("+i+",\""+x.toString()+y.toString()+"\")'>"+i+"</a></td>";
+				}
+				tableText += "</tr><tr>"
+				// bottom half of 2x2 table
+				for(var i = 3; i <= 4; i++) {
+					if(!checkRow(x, y, i) || !checkCol(x, y, i) || !checkReg(x, y, i)) continue;
+					tableText += "<td><a onclick='select("+i+",\""+x.toString()+y.toString()+"\")'>"+i+"</a></td>";
+				}
+				tableText += "</tr></table>";
+				div.innerHTML = tableText;
+			}
+		}
+	}
+	if(won) win();
+}
+
+var curBoard, states, moves;
+window.onload = initialize;
+function newBoard(){
+	location.reload();
+}
+
+</script>
+</head>
+<body>
+	<div id="theGame">
+	<h1>Sudoku</h1>
+	<!-- Create table to play the game on -->
+	<table class="board" border="1">
+		<tr>
+			<td class="out"><div id="00"></div></td>
+			<td class="out"><div id="01"></div></td>
+			<td class="out"><div id="02"></div></td>
+			<td class="out"><div id="03"></div></td>
+		</tr>
+		<tr>
+			<td class="out"><div id="10"></div></td>
+			<td class="out"><div id="11"></div></td>
+			<td class="out"><div id="12"></div></td>
+			<td class="out"><div id="13"></div></td>
+		</tr>
+		<tr>
+			<td class="out"><div id="20"></div></td>
+			<td class="out"><div id="21"></div></td>
+			<td class="out"><div id="22"></div></td>
+			<td class="out"><div id="23"></div></td>
+		</tr>
+		<tr>
+			<td class="out"><div id="30"></div></td>
+			<td class="out"><div id="31"></div></td>
+			<td class="out"><div id="32"></div></td>
+			<td class="out"><div id="33"></div></td>
+		</tr>
+	</table>
+	<br>
+	<div id="buttons">
+	<button type = "button" class = "button button2" onclick="undo()">undo</button>
+	<button type = "button" class = "button button2" onclick="restart()">restart</button>
+	<button type = "button" class = "button button2" onclick="newBoard()">new</button>
+	<button type = "button" class = "button button2" onclick="window.location.href='index.html'">Return</button>
+	</div>
+
+	<h3 id="moveCount"></h3>
+	</div>
+</body>
+</html>
